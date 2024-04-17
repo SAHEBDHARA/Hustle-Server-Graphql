@@ -1,6 +1,7 @@
 import axios from "axios";
 import { prismaClient } from "../../clients/db";
 import Jwtservice from "../../services/jwt";
+import { GraphqlContext } from "../../interfaces";
 
 interface GoogleUserData {
   iss?: string;
@@ -53,6 +54,12 @@ const queries = {
     const userToken = await Jwtservice.generateTokenForUser(userIndb);
     return userToken;
   },
+  getCurrentUser: async (parent: any, arg: any, ctx: GraphqlContext) =>{
+    const id =  ctx.user?.id;
+    if(!id) return null;
+    const user = await prismaClient.user.findUnique({ where: {id}})
+    return user
+  }
 };
 
 export const resolvers = { queries };
